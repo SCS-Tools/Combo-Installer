@@ -3,7 +3,7 @@
   "name": "Combo Installer",
   "desc_ru": "Собирает и применяет порядок модов для крупных карт-комбо ETS2, помогает отделить собственные моды и проверяет игровой журнал.",
   "desc_en": "Builds and applies mod orders for large ETS2 map combos, separates your own mods, and validates the game log.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "icon": "icon.png",
   "banner": "banner.png",
   "runtime": {

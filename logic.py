@@ -407,7 +407,7 @@ def backup_entries():
                 continue
             match = re.match(r"^(.+)-profile\.sii-\d{8}-\d{6}\.bak$", path.name)
             if not match: continue
-            directory = match.group(1).removesuffix("-order")
+            directory = match.group(1)[:-len("-order")] if match.group(1).endswith("-order") else match.group(1)
             text = profile_text(path); mods_list = active_mod_entries(text)
             entries.append({"id": path.name, "name": path.name, "kind": "profile", "profile_dir": directory, "created": created, "mods": mods_list, "mod_count": len(mods_list)})
         except (OSError, ValueError, zlib.error):
@@ -423,7 +423,8 @@ def restore_backup(game_path, backup_id):
     else:
         match = re.match(r"^(.+)-profile\.sii-\d{8}-\d{6}\.bak$", backup_id)
         if not match: return None, "backup_not_found"
-        target = Path(game_path).expanduser() / "profiles" / match.group(1).removesuffix("-order") / "profile.sii"
+        name = match.group(1); directory = name[:-len("-order")] if name.endswith("-order") else name
+        target = Path(game_path).expanduser() / "profiles" / directory / "profile.sii"
     if not target.is_file(): return None, "restore_target_not_found"
     try:
         safety = storage_root() / f"restore-before-{target.name}-{datetime.now():%Y%m%d-%H%M%S}.bak"
@@ -544,7 +545,7 @@ def verify_preset(game_path, preset_id, own_mods=None):
         elif package: own_files.add(f"workshop:{int(package.group(1), 16)}")
         else: own_files.add(file_id)
     extra_mods = [{"file": file_id, "name": value.get("log_name", file_id)} for file_id, value in logged.items() if file_id not in expected_files and file_id not in own_files]
-    # A missing archive cannot also be a meaningful log mismatch.  Present it
+    # A missing archive cannot also be a meaningful log mismatch. Present it
     # once in the more actionable "missing" section.
     missing_files = {item.get("file") for item in files["missing"] if isinstance(item, dict)}
     mismatches = [item for item in parameters["mismatches"] if item.get("file") not in missing_files]
